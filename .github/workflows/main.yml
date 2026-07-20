@@ -23,10 +23,11 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
 
-    - name: Generate Gradle Wrapper
+    - name: Generate Compatible Gradle Wrapper
       run: |
         rm -rf gradlew gradlew.bat gradle/
-        gradle wrapper --gradle-version 8.0
+        # שימוש בגרסת Gradle 8.4 המותאמת באופן מלא לתוסף 8.1.0
+        gradle wrapper --gradle-version 8.4 --distribution-type bin
         chmod +x gradlew
 
     - name: Build with Gradle (Debug APK)
