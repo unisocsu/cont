@@ -23,15 +23,10 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
 
-    - name: Generate complete Gradle Wrapper
+    - name: Generate Gradle Wrapper
       run: |
-        # מחיקת קבצים ריקים ישנים אם קיימים
         rm -rf gradlew gradlew.bat gradle/
-        
-        # יצירת מעטפת גראדל חדשה ותקינה לחלוטין
         gradle wrapper --gradle-version 8.0
-        
-        # מתן הרשאות הרצה לקובץ שנוצר
         chmod +x gradlew
 
     - name: Build with Gradle (Debug APK)
