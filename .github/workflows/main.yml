@@ -32,6 +32,10 @@ jobs:
         ./gradle/bin/gradle wrapper --gradle-version 8.4
         chmod +x gradlew
 
+    - name: Accept Android SDK licenses
+      run: |
+        yes | sdkmanager --licenses || true
+
     - name: Build with Gradle (Debug APK)
       run: ./gradlew assembleDebug
 
