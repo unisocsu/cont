@@ -23,8 +23,16 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
 
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
+    - name: Generate complete Gradle Wrapper
+      run: |
+        # מחיקת קבצים ריקים ישנים אם קיימים
+        rm -rf gradlew gradlew.bat gradle/
+        
+        # יצירת מעטפת גראדל חדשה ותקינה לחלוטין
+        gradle wrapper --gradle-version 8.0
+        
+        # מתן הרשאות הרצה לקובץ שנוצר
+        chmod +x gradlew
 
     - name: Build with Gradle (Debug APK)
       run: ./gradlew assembleDebug
@@ -32,5 +40,5 @@ jobs:
     - name: Upload APK artifact
       uses: actions/upload-artifact@v4
       with:
-        name: app-debug-apk
-        path: '**/*.apk'
+        name: debug-apk
+        path: app/build/outputs/apk/debug/app-debug.apk
