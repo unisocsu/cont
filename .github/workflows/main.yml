@@ -36,8 +36,8 @@ jobs:
       run: |
         yes | sdkmanager --licenses || true
 
-    - name: Build with Gradle (Debug APK with full info)
-      run: ./gradlew assembleDebug --info --stacktrace
+    - name: Build with Gradle (Debug APK)
+      run: ./gradlew assembleDebug --no-daemon
 
     - name: Upload APK artifact
       uses: actions/upload-artifact@v4
