@@ -9,5 +9,5 @@ buildscript {
 }
 
 task clean(type: Delete) {
-    delete rootProject.build.dir
+    delete rootProject.layout.buildDirectory
 }
