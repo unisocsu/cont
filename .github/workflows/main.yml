@@ -12,7 +12,7 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
     - name: Set up JDK 17
       uses: actions/setup-java@v4
@@ -23,11 +23,15 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
 
-    - name: Generate Compatible Gradle Wrapper
+    - name: Download and Setup Gradle 8.4 Manually
       run: |
         rm -rf gradlew gradlew.bat gradle/
-        # שימוש בגרסת Gradle 8.4 המותאמת באופן מלא לתוסף 8.1.0
-        gradle wrapper --gradle-version 8.4 --distribution-type bin
+        # הורדה ישירה של קבצי הבינארי של גראדל 8.4
+        wget https://services.gradle.org/distributions/gradle-8.4-bin.zip
+        unzip -q gradle-8.4-bin.zip
+        mv gradle-8.4 gradle
+        # יצירת קובץ ה-wrapper ידנית מתוך הגרסה שהורדנו
+        ./gradle/bin/gradle wrapper --gradle-version 8.4
         chmod +x gradlew
 
     - name: Build with Gradle (Debug APK)
