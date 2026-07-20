@@ -36,8 +36,8 @@ jobs:
       run: |
         yes | sdkmanager --licenses || true
 
-    - name: Force Build APK Ignoring Dependency Warnings
-      run: ./gradlew assembleDebug --no-daemon --continue || ./gradlew assembleDebug --offline
+    - name: Build APK with Lenient Dependencies
+      run: ./gradlew assembleDebug --no-daemon --warning-mode all
 
     - name: Upload APK artifact
       uses: actions/upload-artifact@v4
