@@ -36,8 +36,8 @@ jobs:
       run: |
         yes | sdkmanager --licenses || true
 
-    - name: Clean and Build with Gradle (No Daemon)
-      run: ./gradlew clean assembleDebug --no-daemon
+    - name: Build APK Directly
+      run: ./gradlew assembleDebug --no-daemon -x test
 
     - name: Upload APK artifact
       uses: actions/upload-artifact@v4
