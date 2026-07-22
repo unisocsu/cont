@@ -1,4 +1,4 @@
-name: Build Android App
+# name: Build Android App
 
 on:
   push:
@@ -32,12 +32,17 @@ jobs:
         ./gradle/bin/gradle wrapper --gradle-version 8.4
         chmod +x gradlew
 
+    - name: Enable AndroidX and Jetifier in gradle.properties
+      run: |
+        echo "android.useAndroidX=true" >> gradle.properties
+        echo "android.enableJetifier=true" >> gradle.properties
+
     - name: Accept Android SDK licenses
       run: |
         yes | sdkmanager --licenses || true
 
-    - name: Build APK with Lenient Dependencies
-      run: ./gradlew assembleDebug --no-daemon --warning-mode all
+    - name: Build APK Successfully
+      run: ./gradlew assembleDebug --no-daemon
 
     - name: Upload APK artifact
       uses: actions/upload-artifact@v4
