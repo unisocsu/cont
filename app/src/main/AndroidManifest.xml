@@ -8,10 +8,20 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="Keyboard Addon"
-        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
 
+        <!-- המסך הראשי של האפליקציה שיוצר את האייקון בטלפון -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- שירות הנגישות והבועה הצפה -->
         <service
             android:name=".FloatingBubbleService"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
