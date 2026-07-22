@@ -1,4 +1,4 @@
-# name: Build Android App
+name: Build Android App
 
 on:
   push:
@@ -32,10 +32,14 @@ jobs:
         ./gradle/bin/gradle wrapper --gradle-version 8.4
         chmod +x gradlew
 
-    - name: Enable AndroidX and Jetifier in gradle.properties
+    - name: Enable AndroidX in gradle.properties
       run: |
         echo "android.useAndroidX=true" >> gradle.properties
         echo "android.enableJetifier=true" >> gradle.properties
+
+    - name: Fix Missing Round Icon in Manifest
+      run: |
+        find . -name "AndroidManifest.xml" -exec sed -i 's/android:roundIcon="@mipmap\/ic_launcher_round"//g' {} +
 
     - name: Accept Android SDK licenses
       run: |
