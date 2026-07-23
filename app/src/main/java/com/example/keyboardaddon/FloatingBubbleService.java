@@ -42,7 +42,7 @@ public class FloatingBubbleService extends AccessibilityService {
         // של המערכת (ולא את זו שמוגדרת ב-Manifest), ואז ה-Button לא מצליח
         // לפענח את אחד האטריביוטים של סגנון ברירת המחדל שלו וקורס עם
         // UnsupportedOperationException: Failed to resolve attribute.
-        Context themedContext = new ContextThemeWrapper(this, R.style.Theme_AppCompat_Light_NoActionBar);
+        Context themedContext = new ContextThemeWrapper(this, androidx.appcompat.R.style.Theme_AppCompat_Light_NoActionBar);
         LayoutInflater inflater = LayoutInflater.from(themedContext);
         bubbleView = inflater.inflate(R.layout.bubble_layout, null);
 
