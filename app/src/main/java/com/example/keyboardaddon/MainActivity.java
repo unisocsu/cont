@@ -32,7 +32,6 @@ public class MainActivity extends AppCompatActivity {
                             Uri.parse("package:" + getPackageName()));
                     startActivity(intent);
                 } else {
-                    Toast.style = Toast.makeText(this, "ההרשאה כבר ניתנה!", Toast.LENGTH_SHORT);
                     Toast.makeText(this, "ההרשאה כבר ניתנה!", Toast.LENGTH_SHORT).show();
                 }
             } else {
