@@ -2,26 +2,37 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:background="@android:drawable/dialog_holo_light_frame"
     android:orientation="horizontal"
-    android:background="@drawable/bubble_background"
-    android:padding="6dp"
-    android:elevation="8dp">
+    android:padding="8di">
 
+    <!-- כפתור חץ שמאלה -->
     <Button
-        android:id="@+id/btnSymbol"
+        android:id="@+id/btnLeft"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:text="&lt;&gt;"
-        android:textSize="12sp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:textColor="@android:color/white" />
+        android:text="←"
+        android:textSize="16sp"
+        android:padding="0dp"
+        android:layout_marginEnd="4dp"/>
 
+    <!-- כפתור חץ ימינה -->
+    <Button
+        android:id="@+id/btnRight"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:text="→"
+        android:textSize="16sp"
+        android:padding="0dp"
+        android:layout_marginEnd="4dp"/>
+
+    <!-- כפתור הדבקה מהלוח -->
     <Button
         android:id="@+id/btnPaste"
-        android:layout_width="40dp"
+        android:layout_width="wrap_content"
         android:layout_height="40dp"
-        android:text="📋"
+        android:text="הדבק"
         android:textSize="14sp"
-        android:background="?attr/selectableItemBackgroundBorderless" />
+        android:paddingHorizontal="12dp"/>
 
 </LinearLayout>
