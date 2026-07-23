@@ -110,11 +110,29 @@ public class FloatingBubbleService extends AccessibilityService {
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
-        if (event.getEventType() == AccessibilityEvent.TYPE_VIEW_FOCUSED || event.getEventType() == AccessibilityEvent.TYPE_VIEW_TEXT_CHANGED) {
+        int eventType = event.getEventType();
+
+        if (eventType == AccessibilityEvent.TYPE_VIEW_FOCUSED) {
             AccessibilityNodeInfo source = event.getSource();
-            if (source != null && source.isEditable()) {
-                currentNode = source;
-                if (bubbleView.getVisibility() != View.VISIBLE) bubbleView.setVisibility(View.VISIBLE);
+            if (source != null) {
+                if (source.isEditable()) {
+                    currentNode = source;
+                    if (bubbleView.getVisibility() != View.VISIBLE) {
+                        bubbleView.setVisibility(View.VISIBLE);
+                    }
+                } else {
+                    // כשעוברים לשדה שאינו ניתן לעריכה, נסתר את הבועה
+                    currentNode = null;
+                    if (bubbleView.getVisibility() == View.VISIBLE) {
+                        bubbleView.setVisibility(View.GONE);
+                    }
+                }
+            }
+        } else if (eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
+            // החלפת מסך או סגירת חלון מעלימה את הבועה ליתר בטחון
+            currentNode = null;
+            if (bubbleView.getVisibility() == View.VISIBLE) {
+                bubbleView.setVisibility(View.GONE);
             }
         }
     }
@@ -128,13 +146,11 @@ public class FloatingBubbleService extends AccessibilityService {
             int start = node.getTextSelectionStart();
             int end = node.getTextSelectionEnd();
 
-            // אם אין מיקום סמן מוגדר, נתחיל מהסוף
             if (start < 0 || end < 0) {
                 start = text.length();
                 end = text.length();
             }
 
-            // חישוב המיקום החדש לפי הכיוון (-1 לשמאלה, 1 ימינה)
             int newPos = start + direction;
             if (newPos < 0) newPos = 0;
             if (newPos > text.length()) newPos = text.length();
@@ -167,7 +183,6 @@ public class FloatingBubbleService extends AccessibilityService {
             args.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, sb.toString());
             node.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, args);
 
-            // העברת הסמן אחרי הטקסט שהודבק
             int newCursorPos = Math.min(start, end) + textToInsert.length();
             Bundle selectionArgs = new Bundle();
             selectionArgs.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_START_INT, newCursorPos);
