@@ -45,6 +45,7 @@ public class FloatingBubbleService extends AccessibilityService {
         params.gravity = Gravity.TOP | Gravity.START;
         params.x = 100; params.y = 100;
 
+        // מנגנון גרירת הבועה על המסך
         bubbleView.setOnTouchListener(new View.OnTouchListener() {
             private boolean isMoving = false;
             @Override
@@ -70,20 +71,38 @@ public class FloatingBubbleService extends AccessibilityService {
             }
         });
 
-        Button btnSymbol = bubbleView.findViewById(R.id.btnSymbol);
-        btnSymbol.setOnClickListener(v -> { if (currentNode != null) insertTextAtCursor(currentNode, "<>"); });
+        // כפתור חץ שמאלה
+        Button btnLeft = bubbleView.findViewById(R.id.btnLeft);
+        if (btnLeft != null) {
+            btnLeft.setOnClickListener(v -> {
+                if (currentNode != null) moveCursor(currentNode, -1);
+            });
+        }
 
+        // כפתור חץ ימינה
+        Button btnRight = bubbleView.findViewById(R.id.btnRight);
+        if (btnRight != null) {
+            btnRight.setOnClickListener(v -> {
+                if (currentNode != null) moveCursor(currentNode, 1);
+            });
+        }
+
+        // כפתור הדבקה מהלוח במיקום הסמן
         Button btnPaste = bubbleView.findViewById(R.id.btnPaste);
-        btnPaste.setOnClickListener(v -> {
-            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-            if (clipboard != null && clipboard.hasPrimaryClip()) {
-                ClipData clip = clipboard.getPrimaryClip();
-                if (clip != null && clip.getItemCount() > 0) {
-                    CharSequence text = clip.getItemAt(0).getText();
-                    if (text != null && currentNode != null) insertTextAtCursor(currentNode, text.toString());
+        if (btnPaste != null) {
+            btnPaste.setOnClickListener(v -> {
+                ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                if (clipboard != null && clipboard.hasPrimaryClip()) {
+                    ClipData clip = clipboard.getPrimaryClip();
+                    if (clip != null && clip.getItemCount() > 0) {
+                        CharSequence text = clip.getItemAt(0).getText();
+                        if (text != null && currentNode != null) {
+                            insertTextAtCursor(currentNode, text.toString());
+                        }
+                    }
                 }
-            }
-        });
+            });
+        }
 
         bubbleView.setVisibility(View.GONE);
         windowManager.addView(bubbleView, params);
@@ -100,6 +119,34 @@ public class FloatingBubbleService extends AccessibilityService {
         }
     }
 
+    // פונקציה להזזת הסמן שמאלה או ימינה
+    private void moveCursor(AccessibilityNodeInfo node, int direction) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+            CharSequence text = node.getText();
+            if (text == null) return;
+
+            int start = node.getTextSelectionStart();
+            int end = node.getTextSelectionEnd();
+
+            // אם אין מיקום סמן מוגדר, נתחיל מהסוף
+            if (start < 0 || end < 0) {
+                start = text.length();
+                end = text.length();
+            }
+
+            // חישוב המיקום החדש לפי הכיוון (-1 לשמאלה, 1 ימינה)
+            int newPos = start + direction;
+            if (newPos < 0) newPos = 0;
+            if (newPos > text.length()) newPos = text.length();
+
+            Bundle args = new Bundle();
+            args.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_START_INT, newPos);
+            args.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_END_INT, newPos);
+            node.performAction(AccessibilityNodeInfo.ACTION_SET_SELECTION, args);
+        }
+    }
+
+    // פונקציה להכנסת טקסט (הדבקה) בדיוק במיקום הסמן בלי לדרוס את השאר
     private void insertTextAtCursor(AccessibilityNodeInfo node, String textToInsert) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
             CharSequence currentText = node.getText();
@@ -108,19 +155,24 @@ public class FloatingBubbleService extends AccessibilityService {
             int start = node.getTextSelectionStart();
             int end = node.getTextSelectionEnd();
 
-            // אם אין בחירה מדויקת או סמן פעיל, נכניס בסוף הטקסט
             if (start < 0 || end < 0) {
                 start = currentText.length();
                 end = currentText.length();
             }
 
-            // בניית המחרוזת החדשה בשילוב הטקסט שהוזרק במיקום הסמן
             StringBuilder sb = new StringBuilder(currentText);
             sb.replace(Math.min(start, end), Math.max(start, end), textToInsert);
 
             Bundle args = new Bundle();
             args.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, sb.toString());
             node.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, args);
+
+            // העברת הסמן אחרי הטקסט שהודבק
+            int newCursorPos = Math.min(start, end) + textToInsert.length();
+            Bundle selectionArgs = new Bundle();
+            selectionArgs.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_START_INT, newCursorPos);
+            selectionArgs.putInt(AccessibilityNodeInfo.ACTION_ARGUMENT_SELECTION_END_INT, newCursorPos);
+            node.performAction(AccessibilityNodeInfo.ACTION_SET_SELECTION, selectionArgs);
         }
     }
 
