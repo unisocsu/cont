@@ -7,10 +7,19 @@
     android:padding="24dp">
 
     <Button
-        android:id="@+id/btnOpenSettings"
+        android:id="@+id/btnOpenAccessibility"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="הפעל שירות נגישות ובועה"
+        android:text="הפעל שירות נגישות"
+        android:textSize="18sp"
+        android:padding="12dp"
+        android:layout_marginBottom="16dp"/>
+
+    <Button
+        android:id="@+id/btnOpenOverlayPermission"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="אפשר הצגת בועה מעל אפליקציות"
         android:textSize="18sp"
         android:padding="12dp"/>
 
