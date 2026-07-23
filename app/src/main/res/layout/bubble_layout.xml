@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:background="@android:drawable/dialog_holo_light_frame"
     android:orientation="horizontal"
-    android:padding="8di">
+    android:padding="8dp">
 
     <!-- כפתור חץ שמאלה -->
     <Button
