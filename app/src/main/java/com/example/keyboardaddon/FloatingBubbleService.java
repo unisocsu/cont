@@ -6,6 +6,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.graphics.PixelFormat;
 import android.os.Build;
+import android.os.Bundle;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -70,7 +71,7 @@ public class FloatingBubbleService extends AccessibilityService {
         });
 
         Button btnSymbol = bubbleView.findViewById(R.id.btnSymbol);
-        btnSymbol.setOnClickListener(v -> { if (currentNode != null) pasteText(currentNode, "<>"); });
+        btnSymbol.setOnClickListener(v -> { if (currentNode != null) insertTextAtCursor(currentNode, "<>"); });
 
         Button btnPaste = bubbleView.findViewById(R.id.btnPaste);
         btnPaste.setOnClickListener(v -> {
@@ -79,7 +80,7 @@ public class FloatingBubbleService extends AccessibilityService {
                 ClipData clip = clipboard.getPrimaryClip();
                 if (clip != null && clip.getItemCount() > 0) {
                     CharSequence text = clip.getItemAt(0).getText();
-                    if (text != null && currentNode != null) pasteText(currentNode, text.toString());
+                    if (text != null && currentNode != null) insertTextAtCursor(currentNode, text.toString());
                 }
             }
         });
@@ -99,10 +100,26 @@ public class FloatingBubbleService extends AccessibilityService {
         }
     }
 
-    private void pasteText(AccessibilityNodeInfo node, String text) {
+    private void insertTextAtCursor(AccessibilityNodeInfo node, String textToInsert) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            android.os.Bundle args = new android.os.Bundle();
-            args.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, text);
+            CharSequence currentText = node.getText();
+            if (currentText == null) currentText = "";
+
+            int start = node.getTextSelectionStart();
+            int end = node.getTextSelectionEnd();
+
+            // אם אין בחירה מדויקת או סמן פעיל, נכניס בסוף הטקסט
+            if (start < 0 || end < 0) {
+                start = currentText.length();
+                end = currentText.length();
+            }
+
+            // בניית המחרוזת החדשה בשילוב הטקסט שהוזרק במיקום הסמן
+            StringBuilder sb = new StringBuilder(currentText);
+            sb.replace(Math.min(start, end), Math.max(start, end), textToInsert);
+
+            Bundle args = new Bundle();
+            args.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, sb.toString());
             node.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, args);
         }
     }
