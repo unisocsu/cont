@@ -7,6 +7,8 @@ import android.content.Context;
 import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -15,8 +17,11 @@ import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.Button;
+import android.widget.Toast;
 
 public class FloatingBubbleService extends AccessibilityService {
+    private static final String TAG = "FloatingBubbleService";
+
     private WindowManager windowManager;
     private View bubbleView;
     private WindowManager.LayoutParams params;
@@ -32,10 +37,16 @@ public class FloatingBubbleService extends AccessibilityService {
     }
 
     private void createFloatingBubble() {
-        LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+        // תיקון: עוטפים את ה-Context של ה-Service בתמה של האפליקציה (AppCompat)
+        // לפני יצירת ה-inflater. בלי זה, ה-inflater מקבל את התמה הבסיסית
+        // של המערכת (ולא את זו שמוגדרת ב-Manifest), ואז ה-Button לא מצליח
+        // לפענח את אחד האטריביוטים של סגנון ברירת המחדל שלו וקורס עם
+        // UnsupportedOperationException: Failed to resolve attribute.
+        Context themedContext = new ContextThemeWrapper(this, R.style.Theme_AppCompat_Light_NoActionBar);
+        LayoutInflater inflater = LayoutInflater.from(themedContext);
         bubbleView = inflater.inflate(R.layout.bubble_layout, null);
 
-        int layoutType = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) ? 
+        int layoutType = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) ?
             WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY : WindowManager.LayoutParams.TYPE_PHONE;
 
         params = new WindowManager.LayoutParams(
@@ -105,7 +116,16 @@ public class FloatingBubbleService extends AccessibilityService {
         }
 
         bubbleView.setVisibility(View.GONE);
-        windowManager.addView(bubbleView, params);
+
+        // עוטפים את addView ב-try/catch כדי לתפוס במפורש מקרה של הרשאת
+        // חלון צף חסרה (SecurityException/BadTokenException), במקום קריסה
+        // שקטה שקשה לאבחן.
+        try {
+            windowManager.addView(bubbleView, params);
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to add bubble view - is SYSTEM_ALERT_WINDOW permission granted?", e);
+            Toast.makeText(this, "שגיאה: לא ניתן להציג את הבועה - בדוק הרשאת 'הצגה מעל אפליקציות אחרות'", Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
