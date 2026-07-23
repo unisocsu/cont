@@ -121,7 +121,6 @@ public class FloatingBubbleService extends AccessibilityService {
                         bubbleView.setVisibility(View.VISIBLE);
                     }
                 } else {
-                    // כשעוברים לשדה שאינו ניתן לעריכה, נסתר את הבועה
                     currentNode = null;
                     if (bubbleView.getVisibility() == View.VISIBLE) {
                         bubbleView.setVisibility(View.GONE);
@@ -129,7 +128,6 @@ public class FloatingBubbleService extends AccessibilityService {
                 }
             }
         } else if (eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
-            // החלפת מסך או סגירת חלון מעלימה את הבועה ליתר בטחון
             currentNode = null;
             if (bubbleView.getVisibility() == View.VISIBLE) {
                 bubbleView.setVisibility(View.GONE);
@@ -137,7 +135,6 @@ public class FloatingBubbleService extends AccessibilityService {
         }
     }
 
-    // פונקציה להזזת הסמן שמאלה או ימינה
     private void moveCursor(AccessibilityNodeInfo node, int direction) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
             CharSequence text = node.getText();
@@ -162,7 +159,6 @@ public class FloatingBubbleService extends AccessibilityService {
         }
     }
 
-    // פונקציה להכנסת טקסט (הדבקה) בדיוק במיקום הסמן בלי לדרוס את השאר
     private void insertTextAtCursor(AccessibilityNodeInfo node, String textToInsert) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
             CharSequence currentText = node.getText();
